@@ -24,6 +24,10 @@ rồi mới chạy đánh giá. Khối 1 không sửa code.
 > chính sách đang hiệu lực vào ngày của ticket**, với mọi lệnh ghi (sổ cái, lỗi hãng, thông báo hãng, trả lời khách) khớp nhau
 > và khớp dữ liệu tracking, **rẻ hơn làm tay** (10.000đ/ticket) và **không đẩy thiệt hại sang bên ngoài LogiX**: hãng vận chuyển
 > không bị ghi lỗi oan, người nhận không bị lộ thông tin, người duyệt không bị ngập quá hạn 60 phút.
+>
+> *Dựa vào `docs/PRD_v1.1.md`:* §2 phạm vi pilot (hoàn phí vận chuyển khi trễ ≥ 3 ngày, tối đa 35.000đ phí; từng đơn của đúng một chủ tài khoản);
+> §3 định nghĩa "chạy đúng" ở mức hệ thống, không chỉ ở model: `approval_bypass` = 0, `db_fact_kept` ≥ 0,95 (dữ kiện DB không bị ticket đè,
+> FM-03), `reply_matches_ledger` ≥ 0,95 (trả lời khách khớp sổ cái, FM-08), `refund_amount_correct` ≥ 0,95.
 
 ### Câu 1.2 · Mục tiêu nhìn từ hai người
 
@@ -35,6 +39,10 @@ rồi mới chạy đánh giá. Khối 1 không sửa code.
   (`ops_limits.review_sla_minutes`) và số ca mỗi ca trực nằm trong sức một người (6 ca/giờ, tối đa 48 ca/ca 480 phút). Mỗi ca
   chuyển tới có đủ ngữ cảnh để quyết trong khoảng 10 phút: lý do chuyển, số tiền đề xuất, chính sách đã áp, độ trễ theo tracking.
   Chị chỉ đứng tên (`approver_id` NV-HANH) cho quyết định chị đã thật sự xem, không bị dùng làm "dấu duyệt" cho quyết định tự động.
+- *Dựa vào:* `data/world.json → staff` (NV-OANH kế toán đối soát hãng và shop; NV-HANH trưởng ca CSKH, người duyệt hoàn tiền vượt hạn mức);
+  `docs/PRD_v1.1.md` §2 (phạm vi: ticket ngoài phạm vi, nhiều khiếu nại cần gộp, tranh chấp thì về người), §4 FM-02 "bỏ qua approval bị từ chối"
+  và FM-07 "hoàn tiền nhầm claim anh em" (phê duyệt là việc của người, tiền và phê duyệt chấm bằng code), §6 (rủi ro mở: chưa có dữ liệu người dùng
+  thật, lỗi chập chờn tần suất thấp). PRD v1.1 của bàn không có mục riêng về người dùng; hai mục tiêu trên lấy vai trò từ `staff`.
 
 ---
 
