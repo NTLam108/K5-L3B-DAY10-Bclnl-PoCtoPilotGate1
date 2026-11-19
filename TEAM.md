@@ -76,17 +76,28 @@ quyết định v1 (Phiếu B mục B8) và v2 (Phiếu C mục C12); câu 3.2, 
 ### Phần việc phụ trách
 
 Vận hành và pháp lý. Câu 1.2, 1.4 (Phiếu A mục A1, A2); câu 2.4, 2.10 (Phiếu B mục B4, B5, B7.5, B7.6, runbook 1–3);
-câu 3.1 phần riêng của thẻ, 3.3, 3.7 (Phiếu C mục C3.4, C4, C5, C9, C10, C11, runbook 4–5); `submission/submission.json`.
+câu 3.1 phần riêng của thẻ S8, 3.3, 3.7 (Phiếu C mục C3.1, C3.4, C4, C5 câu 3.3, C9, C10, C11, runbook 4–5); `submission/submission.json`.
 File: `config/operating_gates.json` mục `operations`, `legal`.
 
 ### Đóng góp cụ thể
 
-(Hiếu tự viết.)
+- Vòng 1: phân tích mục tiêu của kế toán đối soát và trưởng ca CSKH; xây dựng telemetry để phát hiện tác hại với bên thứ ba. Phụ trách HAZOP trên `issue_refund`, các rủi ro ngoài kỹ thuật và checklist go-live 9 nhóm có PIC.
+- Phụ trách phương án vận hành và pháp lý: NV-TUNG chịu trách nhiệm vận hành, NV-HANH duyệt hoàn vượt hạn mức; 1 người trực, công suất 6 ca/giờ, hạn chờ 60 phút. Runbook quy định điều kiện dừng, người tắt công tắc, thời hạn xử lý và phương án giờ cao điểm.
+- Đối chiếu cấu hình `operations` và `legal` với runbook: ghi chú giải thích quyết định, kiểm mẫu 10%; chặn `recipient_contact`, `customer_note` khi gửi hãng; chỉ ghi lỗi hãng khi có nguyên nhân được ghi nhận.
+- Vòng 2 thẻ S8: phân tích quyền kiểm soát của người duyệt, việc chị Hạnh bị đứng tên cho khoản chưa duyệt và ảnh hưởng tới lòng tin; HAZOP của thẻ, giả định môi trường, fault tree sau sửa, risk register và runbook 4–5. Nêu rủi ro còn lại khi bảng phê duyệt cập nhật chậm hoặc một người dùng nhiều tài khoản.
+- Phối hợp với Lâm và Quân đối chiếu kết quả ba mốc: S8 từ 36 ca ùn, chờ lâu nhất 216 phút ở base xuống 0 ca ùn, chờ lâu nhất 5 phút ở after; vẫn giữ 1 người trực, kiểm lại 10%. Phần code cổng và chỉ số theo dõi do Lâm phụ trách.
+- Phụ trách rà thông tin thành viên, thẻ S8, quyết định và ba dòng bắt buộc trong `submission/submission.json` để khớp Phiếu C mục C12 và `TEAM.md`.
+- Có sử dụng ChatGPT/Codex để đọc đề, đối chiếu phân công và dữ liệu vận hành, hỗ trợ thao tác Git và soạn mục cá nhân này.
 
 ### Bằng chứng
 
-(Hiếu tự viết: mã commit, mã lần chạy, dòng trong phiếu.)
+Các commit lưu sản phẩm chung liên quan đến phần việc: `2c88451` (Phiếu B B3–B6), `8c6ed49` (cấu hình vận hành/pháp lý và B7.5–B7.6), `7c275e4` (phân tích thẻ S8, HAZOP, giả định môi trường), `f4007da` (Phiếu C C9–C11), `9749a43` (hồ sơ nộp bài), `5623129` (rà soát C3.4 sau vòng 2).
+
+Báo cáo chung: `submission/runs/grade-report.md`, mã `R-S8-grade-20261119-171937-272069`; ba mốc `R-S8-before-20261119-171938-272069`, `R-S8-prepared-20261119-171938-272069`, `R-S8-after-20261119-171938-272069`. Kết quả `PASS-VISIBLE`, chưa chạy test ẩn; after không lộ dữ liệu cá nhân, không ghi oan cho hãng, không có ca ùn.
+
+Vị trí đối chiếu: Phiếu A A1 câu 1.2, A2 cột telemetry; Phiếu B B4, B5, B7.5, B7.6; Phiếu C C3.1, C3.4, C4, C5 câu 3.3, C9, C10, C11; `config/operating_gates.json` mục `operations`, `legal`.
 
 ### Exit ticket
 
-(Hiếu tự viết.)
+- Một điều học được: an toàn của trợ lý hoàn tiền phụ thuộc cả quyền phê duyệt, dữ liệu đối soát và khả năng xử lý của người trực. Ghi chú giải thích và kiểm mẫu có thể giảm tải cho người duyệt, nhưng phải đi cùng cổng kiểm phê duyệt và điều kiện dừng rõ ràng.
+- Một điều còn chưa chắc: cấu hình 1 người trực, kiểm mẫu 10% có giữ được thời hạn 60 phút khi lượng ticket thật tăng đột biến hay không; cần đo lại tải giờ cao điểm, thời gian chờ và độ trễ cập nhật mã phê duyệt trong pilot thật.
