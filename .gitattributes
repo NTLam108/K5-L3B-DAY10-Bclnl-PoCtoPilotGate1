@@ -1,0 +1,3 @@
+# Giữ nguyên từng byte: các file bị khoá và bản chụp vòng 1 được kiểm bằng sha256 trên byte thô.
+# Không cho git đổi xuống dòng LF/CRLF ở bất kỳ máy nào.
+* -text
