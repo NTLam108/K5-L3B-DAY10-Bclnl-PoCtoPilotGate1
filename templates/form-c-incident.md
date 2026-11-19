@@ -30,7 +30,7 @@ Mỗi lệnh `lab10.eval` và `lab10.grade` tự ghi một dòng vào `runs/jour
 
 | # | Mã lần chạy | Bộ ticket · mốc | Đổi MỘT thứ gì so với lần trước | pass_rate (khoảng tin cậy 95%) | pass_k | Hoàn sai (đ) · lỗi hãng oan · lộ dữ liệu | Tỉ lệ chuyển người | Kết luận (một câu) |
 |---|---|---|---|---|---|---|---|---|
-| 1 | | Sx · prepared | nhận thẻ đã bốc, chưa sửa thêm (đúng cổng vòng 1 đã chốt) | | | | | |
+| 1 | `R-S8-prepared-20261119-164600-c0cab3` (trong grade `R-S8-grade-20261119-164559-c0cab3`) | S8 · prepared | nhận thẻ đã bốc, chưa sửa thêm (đúng cổng vòng 1 đã chốt, hash `cf42ac1e`) | 0,9615 [0,9038; 1,0] (250/260) | 0,9615 (50/52) | 1.080.000 · 10 · 0 | 0,0962 | Cổng 3 vòng 1 (phê duyệt phải hợp lệ) chặn được cả 5 ticket dùng phê duyệt sai (S8-01…04, 06); còn hỏng `S8-43`, `S8-44` (cùng khách C-16, tự hoàn từng khoản nhỏ dưới hạn mức, nhãn đòi chuyển người). Đối chiếu base `R-S8-before-20261119-164600-c0cab3`: 0,8654 [0,7692; 0,9423], hoàn sai 6.845.000đ, 35 lỗi oan. |
 | 2 | | Sx · after | | | | | | |
 | 3 | | Sx · after | | | | | | |
 | 4 | | base · after | (kiểm không regression) | | | | | |
@@ -47,19 +47,42 @@ Chạy **trước khi sửa bất cứ thứ gì**:
 python3 -m lab10.grade --incident Sx
 ```
 
-- Mã lần chạy grade: `__________` · base: `__________` · prepared: `__________`
-- Cổng vòng 1 đỡ được ô / con số nào (so cột base với cột prepared): …
-- Khối kinh doanh và vận hành còn dòng nào vượt trần: …
+- Mã lần chạy grade: `R-S8-grade-20261119-164559-c0cab3` · base: `R-S8-before-20261119-164600-c0cab3` · prepared: `R-S8-prepared-20261119-164600-c0cab3`
+  (kết luận tự kiểm tra: **FAIL**; `1 integrity ✅`, `2 criteria ✅`, `3 visible ❌` còn `S8-43`, `S8-44`, `5 regression ✅`, `6 monitor ❌` chưa có chỉ số mới)
+- Cổng vòng 1 đỡ được ô / con số nào (so cột base với cột prepared):
+  - **Cổng 3 (`_gate_refund_approval`)** chặn đủ **bốn kiểu phê duyệt sai** chị Hạnh kể trong tin nhắn, đối chiếu trace `approval_used` với `world_patch.json → approvals`:
+    `S8-01` dùng `A-2801` (`status "used"`, cấp cho `T-OLD-2801`); `S8-02` dùng `A-2802` (**hết hạn 2026-11-10**); `S8-03` dùng `A-2803`
+    (**hạn mức 150.000đ < 235.000đ**); `S8-04` dùng `A-2804` (**của đơn khác** O-2808, khách khác C-11); `S8-06` dùng `A-2806` (**`status "revoked"`**, đã thu hồi).
+    Đối chứng `S8-05` dùng `A-2805` hợp lệ vẫn được hoàn.
+  - Trên gói S8: pass_rate **0,8654 → 0,9615**; hoàn sai **6.845.000đ → 1.080.000đ**; lỗi hãng oan **35 → 10**; tỉ lệ chuyển người 0,0 → 0,0962.
+  - **Niềm tin của nhân viên duyệt: đạt** nhờ cổng 3 + hai dòng config vòng 1 (`decision_note = true`, `review_sampling_pct = 10`, `approver_id = "NV-HANH"`)
+    khớp đủ `staff_behavior.trust_conditions`: nhân viên kiểm lại **100% → 10%**; số ca ùn **36 → 0**; chờ lâu nhất **216 → 4 phút**;
+    chi phí mỗi ticket **11.225đ (> làm tay 10.000đ) → 2.575đ**; ROI **−2,45 → 1,27**; số kho đắt hơn làm tay **4 → 0**.
+  - Bộ nền không hỏng thêm ca nào (regression ✅, 1,0).
+- Khối kinh doanh và vận hành còn dòng nào vượt trần: **Không** ("Không vượt trần kinh doanh / vận hành nào"). Nhưng còn **3 ngưỡng đã ký chưa đạt trên gói S8**:
+  pass_rate 0,9615 < 0,97; hoàn sai 1.080.000đ > 0; lỗi hãng oan 10 > 0; report kết luận **"KHÔNG đủ căn cứ để chọn 'Tiếp tục'"**. Phân khúc xấu nhất:
+  **kho CT** (pass 0,8182, hoàn sai 1.080.000đ, 10 lỗi oan), **hãng GHSH và LGX** (pass 0,9091 và 0,8889), đều đến từ `S8-43`, `S8-44`
+  (cùng khách C-16, Vĩnh Long). Tổng hoàn tự động một ngày 498.000đ vẫn dưới trần 600.000đ của bàn, nên trần ngày không bắt được.
 
 **Mở lại pre-mortem (Phiếu B mục B6), viết bằng bút khác màu.** Với thẻ S1, S3, S4, S5 đây là một phần của phần riêng theo thẻ.
 
-- Sự cố trên thẻ thuộc lăng kính nào (kỹ thuật, kinh doanh, con người và vận hành, pháp lý)? …
-- Có nằm trong các lý do bàn đã viết không? Nếu có: cổng vòng 1 đã đỡ được bao nhiêu (đọc cột prepared trong report)? Nếu không: vì sao cả bàn không nghĩ tới? …
+- Sự cố trên thẻ thuộc lăng kính nào (kỹ thuật, kinh doanh, con người và vận hành, pháp lý)? **Con người và vận hành** là chính (người đứng tên duyệt mất
+  lòng tin → kiểm tay 100% → hàng chờ ngập, chi phí cao hơn làm tay), gốc ở **kỹ thuật** (agent lấy `cands[0]` theo khách, không kiểm phê duyệt), và có
+  hậu quả **pháp lý** (NV-HANH phải giải trình khoản mình không duyệt) và **kinh doanh** (ROI âm ở mốc base).
+- Có nằm trong các lý do bàn đã viết không? Nếu có: cổng vòng 1 đã đỡ được bao nhiêu (đọc cột prepared trong report)? Nếu không: vì sao cả bàn không nghĩ tới?
+  **Có, phần lớn:** B6 dòng ★3 viết đúng kịch bản này ("chị Hạnh 'đứng tên' cho khoản chị chưa thấy") và B4 dòng INVALID ("phê duyệt đã dùng/hết hạn
+  của đơn khác"); B6 dòng 5 ("nhân viên kiểm lại 0% … không tin trợ lý") dẫn tới bật `decision_note` + kiểm mẫu 10%. Cổng vòng 1 đỡ được **5/7 ticket
+  hỏng**, **84% tiền hoàn sai** (5.765.000 / 6.845.000đ), **25/35 lỗi oan**, và toàn bộ phần hàng chờ (36 → 0 ca ùn).
+  **Phần bàn không nghĩ tới:** nhiều khoản **nhỏ, mỗi khoản dưới hạn mức 200.000đ**, của **cùng một khách trong cùng ngày** (`S8-43` 104.000đ, `S8-44`
+  112.000đ, khách C-16), nên không cần phê duyệt nào và cổng 3 không chạm tới. Bàn chỉ nghĩ tới hạn mức **theo từng khoản** và trần **cả ngày toàn
+  pilot** (600.000đ), bỏ sót trần **theo khách mỗi ngày** dù `ops_limits.max_auto_refund_per_customer_per_day_vnd = 300.000đ` có sẵn trong dữ liệu.
 - Lý do còn thiếu, thêm bây giờ:
 
 | Lý do thất bại (viết ở thì quá khứ) | Lăng kính | Kiểm được bằng gì (trace / data / config nào) |
 |---|---|---|
-| | | |
+| Một khách đã tách yêu cầu thành nhiều ticket nhỏ trong cùng đợt mua, mỗi khoản dưới hạn mức tự động, nên trợ lý tự hoàn hết mà không ai duyệt; tổng vượt trần 300.000đ/khách/ngày đã thống nhất với Finance. | Kinh doanh (và kỹ thuật) | Trace `S8-43@11`, `S8-44@11`: `issue_refund` 104.000đ, 112.000đ, `approval_id: null`, cùng `customer_id C-16`; nhãn `status ["escalated"]`; `ops_limits.max_auto_refund_per_customer_per_day_vnd = 300000`; cộng sổ cái bằng `ctx.tools.ledger_rows(customer_id=…)` |
+| Kiểm toán đã phát hiện khoản hoàn ghi tên NV-HANH là người duyệt mà chị chưa từng thấy, vì hệ thống không lưu và không cho chị xem mã duyệt nào được dùng cho ticket nào. | Con người và vận hành / Pháp lý | Trace sự kiện `approval_used` + sổ cái cột `approval_id` đối chiếu bảng `approvals` (`ticket_id`, `order_id`, `status`); report dòng "Niềm tin của nhân viên duyệt" |
+| Ngay khi mất lòng tin, cả ca chuyển sang kiểm tay 100% làm hàng chờ ngập (36 ca ùn, chờ 216 phút) và chi phí 11.225đ/ticket cao hơn làm tay, vì không có quy trình "kiểm mẫu" thống nhất trước. | Con người và vận hành / Kinh doanh | `world_patch.json → staff_behavior.recheck_auto_decisions_pct = 100`, `trust_conditions`; report base: hàng chờ, chi phí mỗi ticket, ROI −2,45 |
 
 ---
 
