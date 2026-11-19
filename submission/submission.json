@@ -1,12 +1,16 @@
 {
-  "team": "",
-  "members": [],
-  "incident": "",
-  "decision_v1": "",
-  "decision_v2": "",
+  "team": "K5-L3B-DAY10-Bclnl-PoCtoPilotGate1",
+  "members": [
+    "NguyenTrongLam-2A202603817",
+    "NguyenManhQuan-2A202603776",
+    "NguyenDucHieu-2A202603772"
+  ],
+  "incident": "S8",
+  "decision_v1": "Tiếp tục",
+  "decision_v2": "Tiếp tục",
   "three_lines": {
-    "environment_assumption": "",
-    "reduce_or_prevent": "",
-    "measure_in_pilot": ""
+    "environment_assumption": "Mã duyệt trong bảng approvals luôn được trưởng ca NV-HANH cập nhật kịp (mã thu hồi, đã dùng, hết hạn đổi status ngay) và mỗi khách chỉ dùng một customer_id; cổng 3 và cổng 4 tin theo hai dữ liệu này, trong khi ở thẻ S8 chính 5 mã sai (A-2801…A-2806) và 5 ticket tách nhỏ của khách C-16 đã gây 6.845.000đ hoàn sai ở mốc base.",
+    "reduce_or_prevent": "Cổng 3 (mã duyệt phải đúng ticket, đúng đơn, còn hạn, đủ hạn mức, đúng người cấp, chưa dùng) và cổng 4 (trần 300.000đ/khách/ngày) NGĂN hẳn hai đường đã thấy trên S8 vì chặn trước lệnh issue_refund dựa trên bảng approvals và sổ cái chứ không dựa vào model (after: hoàn sai 1.080.000đ → 0, 25/25 lần dùng mã sai bị chuyển NV-HANH); nhưng với tác hại tổng thể chỉ GIẢM khả năng, vì bảng approvals ghi sai hoặc một người dùng nhiều tài khoản vẫn lọt, và lòng tin của người duyệt (kiểm mẫu 10%, 0 ca ùn) là hành vi người có thể mất lại.",
+    "measure_in_pilot": "Trong pilot thật cần đo lại: tỉ lệ mã duyệt bị dùng sai (approval_misuse_rate) và độ trễ cập nhật bảng approvals; số khách và người nhận chạm trần 300.000đ/ngày, kể cả qua nhiều tài khoản; % nhân viên thật sự kiểm lại và thời gian chờ khi lượng ticket thật thay cho 52 ticket/ngày mock; chi phí LLM mỗi ticket và ROI với giá thật thay cho 2.952đ và 2,39; và hành vi khi REFUND-v4 có hiệu lực 2026-12-01."
   }
 }
