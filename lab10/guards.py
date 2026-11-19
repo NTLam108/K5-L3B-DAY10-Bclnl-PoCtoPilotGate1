@@ -89,9 +89,44 @@ def _gate_refund_approval(ctx, action):
             problems.append(f"của đơn {a.get('order_id')}")
         if int(a.get("max_vnd") or 0) < int(action.get("amount_vnd") or 0):
             problems.append(f"hạn mức {a.get('max_vnd')}đ thấp hơn số tiền")
+        # Vòng 2 · thẻ S8 (Phiếu C mục C4 dòng 3): mã phải cấp cho ĐÚNG ticket này, do đúng người duyệt đứng tên, và chưa dùng lần nào.
+        if a.get("ticket_id") and a.get("ticket_id") != action.get("ticket_id"):
+            problems.append(f"cấp cho ticket {a.get('ticket_id')}")
+        approver = ((ctx.gates or {}).get("operations") or {}).get("approver_id")
+        if approver and a.get("approver_id") != approver:
+            problems.append(f"người cấp {a.get('approver_id')} không phải người duyệt đứng tên {approver}")
+        if ctx.tools.ledger_rows(approval_id=approval_id):
+            problems.append("đã được dùng cho một khoản hoàn khác")
     if problems:
         ctx.log("invalid_approval", approval_id=approval_id, problems=problems)
         return Verdict.escalate(f"phê duyệt {approval_id} không dùng được ({', '.join(problems)}): chuyển người duyệt")
+    return None
+
+
+def _today_auto_refunded_for_customer(ctx, customer_id):
+    """Tổng đã hoàn TỰ ĐỘNG (không có mã duyệt) cho một khách trong ngày vận hành đang chạy (bỏ các dòng sổ cái có từ trước hôm nay)."""
+    rows = ctx.tools.ledger_rows()
+    seed_rows = getattr(getattr(ctx.tools, "_w", None), "seed_rows", 0)   # số dòng sổ cái có sẵn trước ngày hôm nay
+    return sum(int(r.get("amount_vnd") or 0) for r in rows[seed_rows:]
+               if r.get("customer_id") == customer_id and not r.get("approval_id"))
+
+
+def _gate_customer_daily_cap(ctx, action):
+    """Cổng 4 · vòng 2, thẻ S8 nhánh [2]: tổng hoàn tự động cho MỘT khách trong ngày không vượt trần Ops/Finance (300.000đ).
+    Chặn kiểu chia một đợt mua thành nhiều ticket nhỏ, mỗi khoản dưới hạn mức nên không cần phê duyệt."""
+    if action.get("approval_id"):
+        return None                                   # khoản có phê duyệt hợp lệ đã qua cổng 3, người duyệt đã thấy
+    cap = (ctx.tools.ops_limits() or {}).get("max_auto_refund_per_customer_per_day_vnd")
+    order = ctx.tools.lookup_order(action.get("order_id"))
+    customer_id = (order or {}).get("customer_id") or ctx.ticket.get("customer_id")
+    if cap is None or not customer_id:
+        return None
+    done = _today_auto_refunded_for_customer(ctx, customer_id)
+    asked = int(action.get("amount_vnd") or 0)
+    if done + asked > cap:
+        ctx.log("customer_daily_cap", customer_id=customer_id, today_vnd=done, asked_vnd=asked, cap_vnd=cap)
+        return Verdict.escalate(f"khách {customer_id} đã được hoàn tự động {done}đ hôm nay, thêm {asked}đ sẽ vượt trần "
+                                f"{cap}đ/khách/ngày: chuyển người duyệt xem cả đợt")
     return None
 
 
@@ -118,7 +153,7 @@ def write_gate(ctx, action):
     # action = {"tool": "issue_refund", "ticket_id":..., "order_id":..., "amount_vnd":..., "payer":..., ...}
     tool = action.get("tool")
     if tool == "issue_refund":
-        for gate in (_gate_refund_approval, _gate_refund_amount):
+        for gate in (_gate_refund_approval, _gate_refund_amount, _gate_customer_daily_cap):
             v = gate(ctx, action)
             if v is not None:
                 return v
