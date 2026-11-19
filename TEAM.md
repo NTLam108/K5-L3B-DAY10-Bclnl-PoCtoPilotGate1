@@ -49,7 +49,12 @@ Phiếu B mục B0, B1, B2, B7.1–B7.3; Phiếu C mục C0, C2, C7, C8.
 
 ### Exit ticket
 
-(Lâm tự viết: một điều học được, một điều còn chưa chắc.)
+- **Một điều học được:** cổng tốt đặt ở lệnh ghi và so với nguồn sự thật (tracking, bảng `approvals`, sổ cái), không đặt ở model hay chữ khách viết.
+  Nhờ vậy cổng 3 viết ở vòng 1 từ việc đọc code (HAZOP dòng INVALID) đã đỡ 5/7 ticket hỏng của thẻ S8 trước khi bàn biết sự cố, và lòng tin
+  của người duyệt hồi lại từ hai con số trong config (ghi chú giải thích, kiểm mẫu 10%) chứ không phải từ thêm code.
+- **Một điều còn chưa chắc:** các cổng có bị bài kiểm tra ẩn lách không, nhất là khi một người dùng nhiều tài khoản để chia nhỏ khoản hoàn
+  (cổng 4 chỉ cộng theo `customer_id`), hoặc khi bảng `approvals` ghi sai; với dữ liệu mock, tôi chưa biết cổng chuyển người có làm hàng chờ
+  ngập khi lượng ticket thật lớn hơn 52 ticket/ngày hay không.
 
 ## NguyenManhQuan-2A202603776
 
